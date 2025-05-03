@@ -115,7 +115,9 @@ const handleShare = (platform: string) => {
 };
 
 const handleCopyLink = () => {
-  navigator.clipboard.writeText(`https://localhost:8080/post/${id}`);
+  navigator.clipboard.writeText(
+    `https://parlons-eosin.vercel.app/post/${id}`
+  );
   toast({
     title: "Lien copié",
     description: "Le lien a été copié dans votre presse-papiers.",

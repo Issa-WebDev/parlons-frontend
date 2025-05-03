@@ -23,10 +23,9 @@ const ReportDialog: React.FC<ReportDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Signaler ce contenu</DialogTitle>
+          <DialogTitle>Signaler le contenu</DialogTitle>
           <DialogDescription>
-            Veuillez indiquer la raison pour laquelle vous souhaitez signaler
-            cette publication.
+            indiquer la raison.
           </DialogDescription>
         </DialogHeader>
 

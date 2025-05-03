@@ -31,7 +31,7 @@ const RecordingControls: React.FC<RecordingControlsProps> = ({
         <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
           <Button
             onClick={onStart}
-            className="rounded-full bg-voicify-orange hover:bg-voicify-orange/90 text-white h-14 w-14 flex items-center justify-center"
+            className="rounded-full bg-voicify-blue hover:bg-voicify-blue/90 text-white h-14 w-14 flex items-center justify-center"
           >
             <Mic size={24} />
           </Button>
@@ -53,7 +53,7 @@ const RecordingControls: React.FC<RecordingControlsProps> = ({
             <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
               <Button
                 onClick={onPause}
-                className="rounded-full bg-amber-500 hover:bg-amber-600 h-12 w-12 flex items-center justify-center"
+                className="rounded-full bg-voicify-blue hover:bg-voicify-blue/90 h-12 w-12 flex items-center justify-center"
               >
                 <Pause size={20} />
               </Button>
