@@ -43,74 +43,37 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     setError(null);
 
     try {
+      let fixedAudioUrl = audioUrl;
+      if (!audioUrl.startsWith("http")) {
+        const backendUrl = "https://parlons-backend.onrender.com";
+        fixedAudioUrl = `${backendUrl}${audioUrl}?t=${Date.now()}`;
+      }
+
+      if (audioRef.current.src !== fixedAudioUrl) {
+        audioRef.current.src = fixedAudioUrl;
+      }
+
+      audioRef.current.volume = isMuted ? 0 : volume;
+
       if (isPlaying) {
         audioRef.current.pause();
         setIsPlaying(false);
-        return;
-      }
-
-      setIsLoading(true);
-
-      // Vérifier si l'URL est déjà absolue
-      let fixedAudioUrl;
-      if (audioUrl.startsWith("http")) {
-        fixedAudioUrl = audioUrl;
-      } else if (audioUrl.startsWith("/")) {
-        // S'assurer que nous avons l'URL du serveur backend
-        // Si vous utilisez un serveur backend différent, modifiez cette URL
-        const backendUrl = "https://parlons-backend.onrender.com"; // À adapter selon votre configuration
-        fixedAudioUrl = `${backendUrl}${audioUrl}?t=${Date.now()}`;
       } else {
-        // Fallback au cas où
-        fixedAudioUrl = `${window.location.origin}/${audioUrl}?t=${Date.now()}`;
+        setIsLoading(true);
+        await audioRef.current.play();
+        setIsPlaying(true);
+        setIsLoading(false);
       }
-
-      console.log("Tentative de chargement audio avec URL:", fixedAudioUrl);
-
-      // Création d'un nouvel élément audio
-      const newAudio = new Audio(fixedAudioUrl);
-      newAudio.preload = "auto";
-      newAudio.volume = isMuted ? 0 : volume;
-
-      // Remplacement de l'ancien élément
-      if (audioRef.current) {
-        // Sauvegarde des événements existants
-        const events = {
-          timeupdate: audioRef.current.ontimeupdate,
-          loadedmetadata: audioRef.current.onloadedmetadata,
-          ended: audioRef.current.onended,
-          error: audioRef.current.onerror
-        };
-
-        audioRef.current.replaceWith(newAudio);
-        audioRef.current = newAudio;
-
-        // Réattachement des événements
-        newAudio.ontimeupdate = events.timeupdate;
-        newAudio.onloadedmetadata = events.loadedmetadata;
-        newAudio.onended = events.ended;
-        newAudio.onerror = (e) => {
-          console.error("Erreur audio:", e);
-          setError("Impossible de lire le fichier audio. Vérifiez le chemin du fichier.");
-          setIsLoading(false);
-          if (events.error) events.error(e);
-        };
-      }
-
-      // Lecture
-      await newAudio.play();
-      setIsPlaying(true);
-      setIsLoading(false);
-
     } catch (err) {
       console.error("Erreur:", err);
-      setError(`Erreur: ${err instanceof Error ? err.message : "Problème de lecture"}`);
+      setError(
+        `Erreur: ${err instanceof Error ? err.message : "Problème de lecture"}`
+      );
       setIsPlaying(false);
       setIsLoading(false);
     }
   };
 
-  // Autres fonctions restent inchangées...
   const handleTimeUpdate = () => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -151,7 +114,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     setVolume(newVolume);
     audio.volume = newVolume;
 
-    if (newVolume=== 0) {
+    if (newVolume === 0) {
       setIsMuted(true);
     } else if (isMuted) {
       setIsMuted(false);
@@ -213,12 +176,10 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     console.log("Audio URL:", audioUrl);
     generateStaticWaveform();
 
-    // Initialiser l'AudioContext uniquement lorsque l'utilisateur interagit avec la page
     const initAudioContext = () => {
       if (!audioContextRef.current) {
         try {
           audioContextRef.current = new (window.AudioContext ||
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (window as any).webkitAudioContext)();
         } catch (error) {
           console.error("Web Audio API not supported", error);
@@ -226,7 +187,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
       }
     };
 
-    // Écouter les événements de clic pour débloquer l'AudioContext
     document.addEventListener("click", initAudioContext, { once: true });
 
     return () => {
@@ -284,7 +244,8 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
       default:
         return {
           container: "p-3",
-          playButton: "h-10 w-10", iconSize: 20,
+          playButton: "h-10 w-10",
+          iconSize: 20,
           showTime: true,
           progressHeight: "h-2",
           waveformHeight: "h-12",
