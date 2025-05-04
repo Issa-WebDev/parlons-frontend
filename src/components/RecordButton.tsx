@@ -62,6 +62,7 @@ const RecordButton: React.FC<RecordButtonProps> = ({ onPostCreated }) => {
             {
               headers: {
                 Authorization: `Bearer ${token}`,
+                "Content-Type": "multipart/form-data",
               },
             }
           );
